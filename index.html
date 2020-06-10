@@ -1,51 +1,74 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script src="https://d3js.org/d3.v2.js"></script>
-  </head>
-  <body>
-    <script type="text/javascript">
-/**
- * A convenient function for taking a transformation (with rotation) on
- * text and modifying it so that it always results in right-up text.
- * Only knows about translate and rotate.  Auto-valigns the text.
- */
-function textrotate(transform) {
-    return function (node) {
-        node.each(function() {
-            var t = d3.transform(d3.functor(transform).apply(this, arguments));
-            node.attr("alignment-baseline", "central");
-            node.style("dominant-baseline", "central");
-            if (t.rotate <= 90 && t.rotate >= -90) {
-                node.attr("text-anchor", "begin");
-                node.attr("transform", t.toString());
-            } else {
-                node.attr("text-anchor", "end");
-                t.rotate = (t.rotate > 0 ? -1 : 1) * (180 - Math.abs(t.rotate));
-                node.attr("transform", t.toString());
-            }
-        });
-    }
-}
-var w = 300, h = 300;
-var n = d3.select("body").insert("svg")
-  .attr("width", w)
-  .attr("height", h)
-  .insert("g")
-  .attr("transform","translate(" + w/2 + "," + w/2 + ")");
-n.insert("circle")
-  .attr("r", 5)
-  .attr("cx", 0)
-  .attr("cy", 0);
-n.insert("text")
-  .text("This is some text");
+<meta charset="utf-8">
+<style>
 
-function f(rot) {
-  n.select("text").call(textrotate("rotate("+rot+")translate(12,0)"));
-  setTimeout(function() { f(rot+1) }, 25);
+body {
+  margin: 40px;
+  font: 14px Helvetica Neue;
 }
-f(0);
-    </script>
-  </body>
-</html>
+
+div {
+  position: relative;
+  overflow: hidden;
+}
+
+span {
+  display: inline-block;
+  position: absolute;
+  height: 16px;
+}
+
+.progress {
+  border: solid 1px #ccc;
+  background: #eee;
+}
+
+.progress .value {
+  background: #3182bd;
+}
+
+</style>
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+var id = 0xffff;
+
+function create() {
+  var duration = 5000 + Math.random() * 25000;
+
+  var div = d3.select("body").insert("div", "div");
+
+  div.append("span")
+      .style("width", "74px")
+      .style("text-align", "right")
+      .text(++id);
+
+  div.append("span")
+      .attr("class", "progress")
+      .style("width", "240px")
+      .style("left", "80px")
+    .append("span")
+      .attr("class", "value")
+    .transition()
+      .duration(duration)
+      .ease("linear")
+      .style("width", "100%");
+
+  div.transition()
+      .style("height", "20px")
+    .transition()
+      .delay(duration)
+      .style("height", "0px")
+      .remove();
+
+  setTimeout(create, Math.random() * 10000);
+}
+
+create();
+create();
+create();
+create();
+create();
+
+</script>
